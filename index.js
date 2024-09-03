@@ -18,10 +18,10 @@ app.use(express.static('public'));
 
 // MySQL connection
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
+    host: '',
+    user: '',
     password: '',
-    database: 'webhook'
+    database: ''
 });
 
 db.connect((err) => {
