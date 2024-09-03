@@ -51,8 +51,8 @@ db.query(createTableQuery, (err) => {
 });
 
 // Telegram bot token and chat ID
-const TELEGRAM_BOT_TOKEN = '7390265210:AAFAFKwsl8OVe-VvCafxVBGhfaQCiQNWsFg'; // Ganti dengan token bot Anda
-const CHAT_ID = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN = 'TOKEN_BOT'; // Ganti dengan token bot Anda
+const CHAT_ID = 'ID_TELEGRAM'; // Ganti dengan chat ID atau grup ID Anda
 
 // Function to send a message to Telegram
 async function sendTelegramMessage(message) {
