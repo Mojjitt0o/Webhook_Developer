@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Developer Fingerspot</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Webhook Developer Fingerspot</a>
+        <form id="excelFileForm" class="form-inline ml-auto" enctype="multipart/form-data">
+            <input type="file" id="excelFile" name="excelFile" class="form-control mr-2" accept=".xlsx, .xls" required>
+            <button type="submit" class="btn btn-primary">Upload Excel</button>
+        </form>
+    </nav>
+    
+    <div class="container">
+        <h2 class="mt-5">How it works?</h2>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/9EL1C_-akvQ" frameborder="0" allowfullscreen></iframe>
+
+        <h2 class="mt-5">Logs</h2>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Cloud ID</th>
+                    <th>Type</th>
+                    <th>Created At</th>
+                    <th>Original Data</th>
+                </tr>
+            </thead>
+            <tbody id="logTable">
+                <!-- Logs will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch logs from server and display them
+            $.getJSON('/log', function(logs) {
+                let logHtml = '';
+                logs.forEach(log => {
+                    logHtml += `<tr>
+                        <td>${log.cloud_id || 'N/A'}</td>
+                        <td>${log.type || 'N/A'}</td>
+                        <td>${log.created_at || 'N/A'}</td>
+                        <td><code>${log.original_data || 'N/A'}</code></td>
+                    </tr>`;
+                });
+                $('#logTable').html(logHtml);
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                // Handle errors
+                console.error('Error fetching logs:', textStatus, errorThrown);
+                $('#logTable').html('<tr><td colspan="4">Failed to fetch logs.</td></tr>');
+            });
+
+            // Handle file upload
+            $('#excelFileForm').on('submit', function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '/upload-excel',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        alert(response.message);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('Error uploading file');
+                        console.error('Upload error:', textStatus, errorThrown);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
