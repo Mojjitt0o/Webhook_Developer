@@ -22,8 +22,8 @@ const db = mysql.createConnection({
     user: '',
     password: '',
     database: ''
-});
-
+}); 
+ 
 db.connect((err) => {
     if (err) {
         console.error('Connection error:', err);
