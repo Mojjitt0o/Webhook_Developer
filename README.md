@@ -22,7 +22,7 @@ Proyek ini adalah aplikasi webhook yang menggunakan Express.js dan MySQL untuk m
 1. **Kloning Repositori**
 
    ```bash
-   git clone https://github.com/username/repository.git
+   git clone https://github.com/Mojjitt0o/Webhook_Developer.git
 
 2. **Masuk ke Direktori Proyek**
    cd repository
