@@ -22,8 +22,8 @@ const db = mysql.createConnection({
     user: '',
     password: '',
     database: ''
-});
-
+}); 
+ 
 db.connect((err) => {
     if (err) {
         console.error('Connection error:', err);
@@ -51,8 +51,8 @@ db.query(createTableQuery, (err) => {
 });
 
 // Telegram bot token and chat ID
-const TELEGRAM_BOT_TOKEN = 'TOKEN_BOT'; // Ganti dengan token bot Anda
-const CHAT_ID = 'ID_TELEGRAM'; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN = ''; // Ganti dengan token bot Anda
+const CHAT_ID = ''; // Ganti dengan chat ID atau grup ID Anda
 
 // Function to send a message to Telegram
 async function sendTelegramMessage(message) {
@@ -114,12 +114,11 @@ app.post('/store', (req, res) => {
 
                 const message = `
 <b>New Log Entry</b>
-<b>Cloud ID:</b> ${cloud_id}
-<b>Type:</b> ${type}
-<b>Created At:</b> ${created_at}
-<b>Original Data:</b> <pre>${original_data}</pre>
 <b>Name:</b> ${name}
 <b>Jabatan:</b> ${jabatan}
+<b>Cloud ID:</b> ${cloud_id}
+<b>Created At:</b> ${created_at}
+<b>Type:</b> ${type}
                 `;
                 console.log('Sending message to Telegram:', message);
                 sendTelegramMessage(message);
