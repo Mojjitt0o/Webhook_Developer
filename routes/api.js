@@ -4,7 +4,7 @@ const axios = require('axios');
 const router = express.Router();
 
 // Konfigurasi header Authorization
-const authorization = 'Bearer SZS7NOV9IBE4TJTI';
+const authorization = 'Bearer ';
 const apiBaseUrl = 'https://developer.fingerspot.io/api/';
 
 // Helper untuk memanggil API eksternal
