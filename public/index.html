@@ -1,45 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook Developer Fingerspot</title>
+    <title>Developer.Fingerspot.iO</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            color: #343a40;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: #54a4f8;
+        }
+
+        .navbar-brand {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .navbar-brand:hover {
+            color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 40px;
+        }
+
+        h2 {
+            color: #070808;
+            font-weight: bold;
+        }
+
+        table {
+            background-color: #ffffff;
+        }
+
+        table th {
+            background-color: #54a4f8;
+            color: #fff;
+        }
+
+        table td {
+            color: #222020;
+        }
+
+        iframe {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #054c97;
+            border-color: #054c97;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004494;
+        }
+
+        /* Log table styling */
+        #logTable code {
+            background-color: #f2f8f8;
+            padding: 5px;
+            display: block;
+            border-radius: 5px;
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 20px;
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #007bff;
+        }
+
+        footer a:hover {
+            color: #0056b3;
+        }
+
+        /* Snowflake styling */
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            z-index: 1000;
+            color: #007bff;
+            font-size: 1.5em;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .snowflake {
+            animation: fall linear infinite;
+        }
+
+        .snowflake:nth-of-type(odd) {
+            animation-duration: 15s;
+        }
+
+        .snowflake:nth-of-type(even) {
+            animation-duration: 12s;
+        }
+
+        .snowflake:nth-of-type(3n) {
+            animation-duration: 20s;
+        }
+    </style>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Webhook Developer Fingerspot</a>
+    <!-- Snowflakes -->
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+    <div class="snowflake">❄</div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">Webhook Developer Fingerspot.iO</a>
         <form id="excelFileForm" class="form-inline ml-auto" enctype="multipart/form-data">
             <input type="file" id="excelFile" name="excelFile" class="form-control mr-2" accept=".xlsx, .xls" required>
             <button type="submit" class="btn btn-primary">Upload Excel</button>
         </form>
     </nav>
-    
-    <div class="container">
-        <h2 class="mt-5">How it works?</h2>
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/9EL1C_-akvQ" frameborder="0" allowfullscreen></iframe>
 
+    <!-- Main Content -->
+    <div class="container">
+        <!-- How it works Section -->
+        <h2>How it works?</h2>
+        <div class="row">
+            <div class="col-md-8">
+                <iframe width="100%" height="315" src="https://www.youtube.com/embed/9EL1C_-akvQ" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="col-md-4">
+                <img src="https://via.placeholder.com/350" alt="Illustration" class="img-fluid rounded shadow-sm" />
+                <p class="mt-3">Learn how the webhook works through our comprehensive tutorial video and guides. Ensure your integration is smooth and efficient.</p>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
         <h2 class="mt-5">Logs</h2>
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Cloud ID</th>
-                    <th>Type</th>
-                    <th>Created At</th>
-                    <th>Original Data</th>
-                </tr>
-            </thead>
-            <tbody id="logTable">
-                <!-- Logs will be populated here -->
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Cloud ID</th>
+                        <th>Type</th>
+                        <th>Created At</th>
+                        <th>Original Data</th>
+                    </tr>
+                </thead>
+                <tbody id="logTable">
+                    <!-- Logs will be populated here -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Webhook Developer Fingerspot | Created by CCO Pamungkas</p>
+        <a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a>
+    </footer>
+
+    <!-- jQuery and Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            const socket = io();
+
+            // Listener untuk event newData
+            socket.on('newData', function (newData) {
+                // Update tabel log dengan data baru
+                let newRow = `<tr>
+                    <td>${newData.cloud_id || 'N/A'}</td>
+                    <td>${newData.type || 'N/A'}</td>
+                    <td>${newData.created_at || 'N/A'}</td>
+                    <td><code>${newData.original_data || 'N/A'}</code></td>
+                </tr>`;
+                $('#logTable').prepend(newRow);
+
+                // Notifikasi pop-up
+                alert('Halo ada data masuk!');
+            });
+
             // Fetch logs from server and display them
-            $.getJSON('/log', function(logs) {
+            $.getJSON('/log', function (logs) {
                 let logHtml = '';
                 logs.forEach(log => {
                     logHtml += `<tr>
@@ -50,14 +227,14 @@
                     </tr>`;
                 });
                 $('#logTable').html(logHtml);
-            }).fail(function(jqXHR, textStatus, errorThrown) {
+            }).fail(function (jqXHR, textStatus, errorThrown) {
                 // Handle errors
                 console.error('Error fetching logs:', textStatus, errorThrown);
                 $('#logTable').html('<tr><td colspan="4">Failed to fetch logs.</td></tr>');
             });
 
             // Handle file upload
-            $('#excelFileForm').on('submit', function(event) {
+            $('#excelFileForm').on('submit', function (event) {
                 event.preventDefault();
                 var formData = new FormData(this);
 
@@ -67,16 +244,51 @@
                     data: formData,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         alert(response.message);
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         alert('Error uploading file');
                         console.error('Upload error:', textStatus, errorThrown);
                     }
                 });
             });
+
+            // Snowflake generation script
+            function createSnowflakes() {
+                const body = document.body;
+                const numberOfSnowflakes = 20;
+
+                for (let i = 0; i < numberOfSnowflakes; i++) {
+                    const snowflake = document.createElement('div');
+                    snowflake.classList.add('snowflake');
+                    snowflake.style.left = Math.random() * window.innerWidth + 'px';
+                    snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+                    snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                    snowflake.innerText = '❄';
+                    body.appendChild(snowflake);
+                }
+            }
+
+            createSnowflakes();
         });
+
+        // Socket.IO connection and notification function
+        const socket = io();
+
+        // Listener for 'notification' event
+        socket.on('notification', (data) => {
+            console.log('Notifikasi diterima dari server:', data);
+
+            // Display notification on the web page
+            alert(`Notifikasi: ${JSON.stringify(data)}`);
+        });
+
+        // Function to send notification to the server
+        function sendNotification(data) {
+            socket.emit('notification', data);
+        }
     </script>
 </body>
+
 </html>
