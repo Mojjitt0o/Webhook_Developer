@@ -24,10 +24,10 @@ const io = socketIo(server);
 
 // Koneksi MySQL
 const db = mysql.createConnection({
-    host: '',
-    user: '',
+    host: 'localhost',
+    user: 'root',
     password: '',
-    database: ''
+    database: 'webhook'
 });
 
 db.connect((err) => {
@@ -58,8 +58,8 @@ db.query(createTableQuery, (err) => {
 });
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN = ''; // Ganti dengan token bot Anda
-const CHAT_ID = ''; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN = '7390265210:AAFAFKwsl8OVe-VvCafxVBGhfaQCiQNWsFg'; // Ganti dengan token bot Anda
+const CHAT_ID = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
 
 // Fungsi untuk mengirim pesan ke Telegram
 async function sendTelegramMessage(message) {
@@ -97,7 +97,7 @@ async function sendEndpointNotification(endpoint, data) {
 }
 
 // Helper untuk memanggil API eksternal
-const authorization = 'Bearer ';
+const authorization = 'Bearer SZS7NOV9IBE4TJTI';
 const apiBaseUrl = 'https://developer.fingerspot.io/api/';
 
 async function callApi(endpoint, data, res, notificationEndpoint) {
@@ -174,6 +174,89 @@ app.post('/api/set_userinfo', (req, res) => {
 
 // Rute /store dengan notifikasi Telegram dan notifikasi endpoint opsional
 // Rute /store dengan notifikasi Telegram dan notifikasi endpoint opsional
+// app.post('/store', (req, res) => {
+//     console.log('Menerima permintaan di /store dengan body:', req.body);
+//     const original_data = JSON.stringify(req.body);
+//     const { type, cloud_id, data, notification_endpoint } = req.body;
+//     const created_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+//     // Ekstrak informasi waktu dari original_data
+//     let scanTime = data && data.scan ? data.scan : 'Unknown';
+//     try {
+//         const parsedData = JSON.parse(original_data);
+//         if (parsedData && parsedData.scan) {
+//             scanTime = parsedData.scan;
+//         }
+//     } catch (err) {
+//         console.error('Error parsing original_data:', err);
+//     }
+
+//     const sql = "INSERT INTO t_log (cloud_id, type, created_at, original_data) VALUES (?, ?, ?, ?)";
+//     db.query(sql, [cloud_id, type, created_at, original_data], (error, results) => {
+//         if (error) {
+//             console.error('Error menyimpan log:', error);
+//             return res.status(500).json({ error: error.message });
+//         }
+//         console.log('Entri log berhasil dimasukkan');
+
+//         let pin = data && data.pin ? data.pin : 'Unknown';
+//         let name = 'Unknown';
+//         let jabatan = 'Unknown';
+//         let password = 'Unknown';
+
+//         if (data && data.pin) {
+//             // Jika PIN ada, query database untuk mengambil detail karyawan
+//             const pinVerificationSql = "SELECT nama, jabatan, password FROM karyawan WHERE pin = ?";
+//             db.query(pinVerificationSql, [pin], (pinError, pinResults) => {
+//                 if (pinError) {
+//                     console.error('Error menanyakan data pin:', pinError);
+//                     return res.status(500).json({ error: 'Error menanyakan data pin' });
+//                 }
+
+//                 if (pinResults.length > 0) {
+//                     name = pinResults[0].nama;
+//                     jabatan = pinResults[0].jabatan;
+//                     password = pinResults[0].password;
+//                 }
+
+//                 sendNotificationAndRespond();
+//             });
+//         } else {
+//             // Jika tidak ada PIN, tetap kirim notifikasi
+//             sendNotificationAndRespond();
+//         }
+
+//         function sendNotificationAndRespond() {
+//             const message = `
+// <b>Entri Log Baru</b>
+// <b>PIN:</b> ${pin}
+// <b>Nama:</b> ${name}
+// <b>Jabatan:</b> ${jabatan}
+// <b>Password:</b> ${password}
+// <b>Cloud ID:</b> ${cloud_id}
+// <b>Waktu Scan:</b> ${scanTime}
+// <b>Data Asli:</b> ${original_data}`;
+
+//             sendTelegramMessage(message);
+
+//             if (notification_endpoint) {
+//                 sendEndpointNotification(notification_endpoint, req.body);
+//             }
+
+//             // Emit event ke semua klien
+//             io.emit('newData', {
+//                 cloud_id,
+//                 type,
+//                 created_at,
+//                 original_data
+//             });
+
+//             res.json({ message: 'Log diterima dan notifikasi dikirim' });
+//         }
+//     });
+// });
+
+// Rute /store dengan notifikasi Telegram dan notifikasi endpoint opsional
 app.post('/store', (req, res) => {
     console.log('Menerima permintaan di /store dengan body:', req.body);
     const original_data = JSON.stringify(req.body);
@@ -191,8 +274,15 @@ app.post('/store', (req, res) => {
         console.error('Error parsing original_data:', err);
     }
 
-    const sql = "INSERT INTO t_log (cloud_id, type, created_at, original_data) VALUES (?, ?, ?, ?)";
-    db.query(sql, [cloud_id, type, created_at, original_data], (error, results) => {
+    // Potong original_data jika panjangnya melebihi batas
+    const maxDataLength = 3000; // Sesuaikan dengan batas panjang yang sesuai
+    const truncatedOriginalData = original_data.length > maxDataLength
+        ? original_data.substring(0, maxDataLength) + '...'
+        : original_data;
+
+    // Perbarui query SQL untuk memasukkan scanTime
+    const sql = "INSERT INTO t_log (cloud_id, type, created_at, original_data, scanTime) VALUES (?, ?, ?, ?, ?)";
+    db.query(sql, [cloud_id, type, created_at, truncatedOriginalData, scanTime], (error, results) => {
         if (error) {
             console.error('Error menyimpan log:', error);
             return res.status(500).json({ error: error.message });
@@ -224,38 +314,43 @@ app.post('/store', (req, res) => {
         } else {
             // Jika tidak ada PIN, tetap kirim notifikasi
             sendNotificationAndRespond();
-        }
+         }
 
-        function sendNotificationAndRespond() {
-            const message = `
-<b>Entri Log Baru</b>
-<b>PIN:</b> ${pin}
-<b>Nama:</b> ${name}
-<b>Jabatan:</b> ${jabatan}
-<b>Password:</b> ${password}
-<b>Cloud ID:</b> ${cloud_id}
-<b>Waktu Scan:</b> ${scanTime}
-<b>Data Asli:</b> ${original_data}`;
-
-            sendTelegramMessage(message);
-
-            if (notification_endpoint) {
-                sendEndpointNotification(notification_endpoint, req.body);
+            function sendNotificationAndRespond() {
+                // Membatasi panjang pesan untuk Telegram agar tidak melebihi batas
+                const message = `
+    <b>Entri Log Baru</b>
+    <b>PIN:</b> ${pin}
+    <b>Nama:</b> ${name}
+    <b>Jabatan:</b> ${jabatan}
+    <b>Password:</b> ${password}
+    <b>Cloud ID:</b> ${cloud_id}
+    <b>Waktu Scan:</b> ${scanTime}
+    <b>Data Asli:</b> ${truncatedOriginalData}`;
+    
+                // Mengirim pesan ke Telegram
+                sendTelegramMessage(message);
+    
+                // Mengirim notifikasi ke endpoint jika ada
+                if (notification_endpoint) {
+                    sendEndpointNotification(notification_endpoint, req.body);
+                }
+    
+                // Emit event ke semua klien
+                io.emit('newData', {
+                    cloud_id,
+                    type,
+                    created_at,
+                    original_data: truncatedOriginalData
+                });
+    
+                // Mengirim respon ke klien
+                res.json({ message: 'Log diterima dan notifikasi dikirim' });
             }
-
-            // Emit event ke semua klien
-            io.emit('newData', {
-                cloud_id,
-                type,
-                created_at,
-                original_data
-            });
-
-            res.json({ message: 'Log diterima dan notifikasi dikirim' });
-        }
+        });
     });
-});
 
+    
 
 // Rute untuk mengunggah file Excel
 const upload = multer({ dest: 'uploads/' });
@@ -297,6 +392,51 @@ app.post('/upload-excel', upload.single('file'), (req, res) => {
         res.status(500).send('Terjadi kesalahan saat memproses file Excel.');
     }
 });
+
+const excelExport = require('xlsx');
+
+// Endpoint untuk mengekspor data logs menjadi file Excel
+app.get('/export-logs', (req, res) => {
+    // Query untuk mendapatkan log yang valid
+    const sql = `
+        SELECT l.cloud_id, l.type, l.created_at, l.scanTime, k.nama, k.jabatan
+        FROM t_log l
+        INNER JOIN karyawan k ON l.cloud_id = k.cloud_id
+        WHERE l.type = 'attlog'
+        AND l.scanTime IS NOT NULL
+        AND l.scanTime != ''
+    `;
+    
+    
+    db.query(sql, (error, results) => {
+        if (error) {
+            console.error('Error fetching logs:', error);
+            return res.status(500).json({ error: 'Error fetching logs' });
+        }
+
+        // Memeriksa apakah ada data yang diambil
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Tidak ada data log untuk diekspor' });
+        }
+
+        // Membuat worksheet dari hasil query
+        const worksheet = excelExport.utils.json_to_sheet(results, {
+            header: ['cloud_id', 'type', 'created_at', 'scanTime', 'nama', 'jabatan']
+        });
+        const workbook = excelExport.utils.book_new();
+        excelExport.utils.book_append_sheet(workbook, worksheet, 'Logs');
+
+        // Mengonversi workbook menjadi file buffer
+        const buffer = excelExport.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // Mengirim file Excel sebagai respon
+        res.setHeader('Content-Disposition', 'attachment; filename="logs.xlsx"');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.send(buffer);
+    });
+});
+
+
 
 // Menangani koneksi socket.io
 io.on('connection', (socket) => {
