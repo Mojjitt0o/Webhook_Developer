@@ -396,17 +396,17 @@ app.post('/upload-excel', upload.single('file'), (req, res) => {
 const excelExport = require('xlsx');
 
 // Endpoint untuk mengekspor data logs menjadi file Excel
+// Endpoint untuk mengekspor data logs menjadi file Excel
 app.get('/export-logs', (req, res) => {
     // Query untuk mendapatkan log yang valid
     const sql = `
-        SELECT l.cloud_id, l.type, l.created_at, l.scanTime, k.nama, k.jabatan
+        SELECT k.pin, k.nama,  k.jabatan, l.cloud_id, l.type, l.scanTime
         FROM t_log l
-        INNER JOIN karyawan k ON l.cloud_id = k.cloud_id
+        INNER JOIN karyawan k ON JSON_UNQUOTE(JSON_EXTRACT(l.original_data, '$.data.pin')) = k.pin
         WHERE l.type = 'attlog'
         AND l.scanTime IS NOT NULL
         AND l.scanTime != ''
     `;
-    
     
     db.query(sql, (error, results) => {
         if (error) {
@@ -421,7 +421,7 @@ app.get('/export-logs', (req, res) => {
 
         // Membuat worksheet dari hasil query
         const worksheet = excelExport.utils.json_to_sheet(results, {
-            header: ['cloud_id', 'type', 'created_at', 'scanTime', 'nama', 'jabatan']
+            header: ['pin',  'nama', 'jabatan', 'cloud_id', 'type','scanTime']
         });
         const workbook = excelExport.utils.book_new();
         excelExport.utils.book_append_sheet(workbook, worksheet, 'Logs');
@@ -435,6 +435,7 @@ app.get('/export-logs', (req, res) => {
         res.send(buffer);
     });
 });
+
 
 
 
