@@ -471,10 +471,10 @@ const io = socketIo(server);
 
 // Koneksi MySQL
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
+    host: '',
+    user: '',
     password: '',
-    database: 'webhook'
+    database: ''
 });
 
 db.connect((err) => {
@@ -505,15 +505,15 @@ db.query(createTableQuery, (err) => {
 });
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN = '7390265210:AAFAFKwsl8OVe-VvCafxVBGhfaQCiQNWsFg'; // Ganti dengan token bot Anda
-const CHAT_ID = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN = ''; // Ganti dengan token bot Anda
+const CHAT_ID = ''; // Ganti dengan chat ID atau grup ID Anda
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN1 = '7269989921:AAEDVrc3hBFDCuqblhV8Pga5a3NaFvPR5iw'; // Ganti dengan token bot Anda
-const CHAT_ID1 = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN1 = ''; // Ganti dengan token bot Anda
+const CHAT_ID1 = ''; // Ganti dengan chat ID atau grup ID Anda
 
 // URL webhook Telegram
-const TELEGRAM_WEBHOOK_URL = 'https://25ba-104-28-247-133.ngrok-free.app/'; // Ganti dengan URL webhook Anda
+const TELEGRAM_WEBHOOK_URL = ''; // Ganti dengan URL webhook Anda
 
 
 // Fungsi untuk mengirim pesan ke Telegram
@@ -552,7 +552,7 @@ async function sendEndpointNotification(endpoint, data) {
 }
 
 // Helper untuk memanggil API eksternal
-const authorization = 'Bearer SZS7NOV9IBE4TJTI';
+const authorization = 'Bearer ';
 const apiBaseUrl = 'https://developer.fingerspot.io/api/';
 
 async function callApi(endpoint, data, res, notificationEndpoint) {
