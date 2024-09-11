@@ -148,6 +148,108 @@
                 font-size: 12px;
             }
         }
+
+        /* Chat Box Styles */
+        #chatBox {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            display: none;
+            flex-direction: column;
+            display: flex;
+        }
+
+        #chatHeader {
+            background: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+
+        #chatHeader .minimize-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #chatBody {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+        }
+
+        #chatBody div {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: #f1f1f1;
+        }
+
+        #chatBody .user-message {
+            background: #007bff;
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        #chatBody .bot-message {
+            background: #e1e1e1;
+            color: #333;
+            align-self: flex-start;
+        }
+
+        #chatInput {
+            border-top: 1px solid #ccc;
+            display: flex;
+            padding: 10px;
+        }
+
+        #chatInput input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #chatInput button {
+            border: none;
+            background: #007bff;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        #chatIcon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -168,7 +270,7 @@
     <nav class="navbar navbar-expand-lg navbar-light">
         <a class="navbar-brand" href="#">Webhook Developer Fingerspot.iO</a>
         <form id="excelFileForm" class="form-inline ml-auto" enctype="multipart/form-data">
-            <input type="file" id="excelFile" name="excelFile" class="form-control mr-2" accept=".xlsx, .xls" required>
+            <input type="file" id="excelFile" name="file" class="form-control mr-2" accept=".xlsx, .xls" required>
             <button type="submit" class="btn btn-primary">Upload Excel</button>
         </form>
     </nav>
@@ -209,6 +311,26 @@
         <button id="exportLogs" class="btn btn-success mt-3">Export Logs to Excel</button>
     </div>
 
+    <!-- Chat Box -->
+    <div id="chatBox">
+        <div id="chatHeader">
+            Chat
+            <button class="minimize-btn" title="Minimize">−</button>
+        </div>
+        <div id="chatBody">
+            <!-- Pesan chat akan ditampilkan di sini -->
+        </div>
+        <div id="chatInput">
+            <input type="text" id="messageInput" placeholder="Ketik pesan...">
+            <button id="sendButton">Kirim</button>
+        </div>
+    </div>
+
+    <!-- Icon Chat -->
+    <div id="chatIcon">
+        <span>💬</span>
+    </div>
+
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 Webhook Developer Fingerspot | Created by CCO Pamungkas</p>
@@ -232,10 +354,9 @@
                 "order": [[2, "desc"]] // Urutkan berdasarkan kolom 'Created At' secara menurun
             });
 
-            // Listener for event newData
-            socket.on('newData', function (newData) {
+            // Listener for 'newData' event
+            socket.on('update', function (newData) {
                 // Add new row to DataTable
-                let table = $('#logTable').DataTable();
                 table.row.add([
                     newData.cloud_id || 'N/A',
                     newData.type || 'N/A',
@@ -252,7 +373,6 @@
 
             // Fetch logs from server and display them
             $.getJSON('/log', function (logs) {
-                let table = $('#logTable').DataTable();
                 logs.forEach(log => {
                     table.row.add([
                         log.cloud_id || 'N/A',
@@ -264,11 +384,9 @@
 
                 // Sort after data is loaded
                 table.order([[2, 'desc']]).draw();
-
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 // Handle errors
                 console.error('Error fetching logs:', textStatus, errorThrown);
-                let table = $('#logTable').DataTable();
                 table.clear().rows.add([['Failed to fetch logs', '', '', '']]).draw();
             });
 
@@ -315,25 +433,62 @@
             }
 
             createSnowflakes();
+
+            // Socket.IO connection and notification function
+            // const socket = io();
+
+            // Listener for 'notification' event
+            socket.on('notification', (data) => {
+                console.log('Notifikasi diterima dari server:', data);
+
+                // Display notification on the web page
+                alert(`Notifikasi: ${JSON.stringify(data)}`);
+            });
+
+            // Function to send notification to the server
+            function sendNotification(data) {
+                socket.emit('notification', data);
+            }
+
+            // Chat functionality
+            const chatBox = document.getElementById('chatBox');
+            const chatHeader = document.getElementById('chatHeader');
+            const chatBody = document.getElementById('chatBody');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const minimizeButton = document.querySelector('#chatHeader .minimize-btn');
+            const chatIcon = document.getElementById('chatIcon');
+
+            chatHeader.addEventListener('click', () => {
+                chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+            });
+
+            minimizeButton.addEventListener('click', () => {
+                chatBox.style.display = 'none';
+            });
+
+            chatIcon.addEventListener('click', () => {
+                chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+            });
+
+            sendButton.addEventListener('click', () => {
+                const message = messageInput.value;
+                if (message) {
+                    socket.emit('chatMessage', message);
+                    messageInput.value = '';
+                    chatBody.innerHTML += `<div class="user-message">${message}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
+                }
+            });
+
+            // Listen for chat messages from the server (e.g., from Telegram bot)
+            socket.on('telegramMessage', (message) => {
+                console.log('Pesan dari bot Telegram diterima:', message);
+                chatBody.innerHTML += `<div class="bot-message">${message}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
+            });
         });
-
-        // Socket.IO connection and notification function
-        const socket = io();
-
-        // Listener for 'notification' event
-        socket.on('notification', (data) => {
-            console.log('Notifikasi diterima dari server:', data);
-
-            // Display notification on the web page
-            alert(`Notifikasi: ${JSON.stringify(data)}`);
-        });
-
-        // Function to send notification to the server
-        function sendNotification(data) {
-            socket.emit('notification', data);
-        }
-
-    </script>
+    </script>    
 </body>
 
 </html>
