@@ -7,6 +7,8 @@
     <title>Developer.Fingerspot.iO</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -30,12 +32,13 @@
         }
 
         .container {
-            margin-top: 40px;
+            margin-top: 20px;
         }
 
         h2 {
             color: #070808;
             font-weight: bold;
+            margin-bottom: 20px;
         }
 
         table {
@@ -56,7 +59,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Button styling */
         .btn-primary {
             background-color: #054c97;
             border-color: #054c97;
@@ -68,7 +70,6 @@
             border-color: #004494;
         }
 
-        /* Log table styling */
         #logTable code {
             background-color: #f2f8f8;
             padding: 5px;
@@ -76,12 +77,11 @@
             border-radius: 5px;
         }
 
-        /* Footer styling */
         footer {
             background-color: #343a40;
             color: #fff;
             padding: 20px;
-            margin-top: 50px;
+            margin-top: 30px;
             text-align: center;
             font-size: 14px;
         }
@@ -94,7 +94,6 @@
             color: #0056b3;
         }
 
-        /* Snowflake styling */
         .snowflake {
             position: fixed;
             top: -10px;
@@ -125,6 +124,29 @@
 
         .snowflake:nth-of-type(3n) {
             animation-duration: 20s;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .container {
+                margin-top: 10px;
+            }
+
+            iframe {
+                height: 200px;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            footer {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -160,7 +182,7 @@
                 <iframe width="100%" height="315" src="https://www.youtube.com/embed/9EL1C_-akvQ" frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="col-md-4">
-                <img src="https://via.placeholder.com/350" alt="Illustration" class="img-fluid rounded shadow-sm" />
+                <img src="https://mentorit.com.np/wp-content/uploads/2016/10/red-hat-enterprise-linux-workstation-standard-subscription-rh0958488f3-redhat-0g559-1.jpg" alt="Illustration" class="img-fluid rounded shadow-sm" />
                 <p class="mt-3">Learn how the webhook works through our comprehensive tutorial video and guides. Ensure your integration is smooth and efficient.</p>
             </div>
         </div>
@@ -168,7 +190,7 @@
         <!-- Logs Section -->
         <h2 class="mt-5">Logs</h2>
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table id="logTable" class="display">
                 <thead>
                     <tr>
                         <th>Cloud ID</th>
@@ -177,11 +199,14 @@
                         <th>Original Data</th>
                     </tr>
                 </thead>
-                <tbody id="logTable">
+                <tbody>
                     <!-- Logs will be populated here -->
                 </tbody>
             </table>
         </div>
+
+        <!-- Export Button -->
+        <button id="exportLogs" class="btn btn-success mt-3">Export Logs to Excel</button>
     </div>
 
     <!-- Footer -->
@@ -193,6 +218,8 @@
     <!-- jQuery and Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 
     <!-- Socket.IO -->
     <script src="/socket.io/socket.io.js"></script>
@@ -200,16 +227,24 @@
         $(document).ready(function () {
             const socket = io();
 
-            // Listener untuk event newData
+            // Initialize DataTable
+            let table = $('#logTable').DataTable({
+                "order": [[2, "desc"]] // Urutkan berdasarkan kolom 'Created At' secara menurun
+            });
+
+            // Listener for event newData
             socket.on('newData', function (newData) {
-                // Update tabel log dengan data baru
-                let newRow = `<tr>
-                    <td>${newData.cloud_id || 'N/A'}</td>
-                    <td>${newData.type || 'N/A'}</td>
-                    <td>${newData.created_at || 'N/A'}</td>
-                    <td><code>${newData.original_data || 'N/A'}</code></td>
-                </tr>`;
-                $('#logTable').prepend(newRow);
+                // Add new row to DataTable
+                let table = $('#logTable').DataTable();
+                table.row.add([
+                    newData.cloud_id || 'N/A',
+                    newData.type || 'N/A',
+                    newData.created_at || 'N/A',
+                    `<code>${newData.original_data || 'N/A'}</code>`
+                ]).draw();
+
+                // Re-sort the table to ensure the latest entry is on top
+                table.order([[2, 'desc']]).draw();
 
                 // Notifikasi pop-up
                 alert('Halo ada data masuk!');
@@ -217,20 +252,24 @@
 
             // Fetch logs from server and display them
             $.getJSON('/log', function (logs) {
-                let logHtml = '';
+                let table = $('#logTable').DataTable();
                 logs.forEach(log => {
-                    logHtml += `<tr>
-                        <td>${log.cloud_id || 'N/A'}</td>
-                        <td>${log.type || 'N/A'}</td>
-                        <td>${log.created_at || 'N/A'}</td>
-                        <td><code>${log.original_data || 'N/A'}</code></td>
-                    </tr>`;
+                    table.row.add([
+                        log.cloud_id || 'N/A',
+                        log.type || 'N/A',
+                        log.created_at || 'N/A',
+                        `<code>${log.original_data || 'N/A'}</code>`
+                    ]).draw();
                 });
-                $('#logTable').html(logHtml);
+
+                // Sort after data is loaded
+                table.order([[2, 'desc']]).draw();
+
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 // Handle errors
                 console.error('Error fetching logs:', textStatus, errorThrown);
-                $('#logTable').html('<tr><td colspan="4">Failed to fetch logs.</td></tr>');
+                let table = $('#logTable').DataTable();
+                table.clear().rows.add([['Failed to fetch logs', '', '', '']]).draw();
             });
 
             // Handle file upload
@@ -252,6 +291,11 @@
                         console.error('Upload error:', textStatus, errorThrown);
                     }
                 });
+            });
+
+            // Export Logs to Excel
+            $('#exportLogs').click(function () {
+                window.location.href = '/export-logs';
             });
 
             // Snowflake generation script
@@ -288,7 +332,9 @@
         function sendNotification(data) {
             socket.emit('notification', data);
         }
+
     </script>
 </body>
 
 </html>
+
