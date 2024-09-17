@@ -235,21 +235,7 @@
             margin-left: 10px;
         }
 
-        #chatIcon {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #007bff;
-            color: #fff;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-        }
+        
     </style>
 </head>
 
@@ -312,23 +298,23 @@
     </div>
 
     <!-- Chat Box -->
-    <div id="chatBox">
-        <div id="chatHeader">
-            Chat
-            <button class="minimize-btn" title="Minimize">−</button>
-        </div>
-        <div id="chatBody">
-            <!-- Pesan chat akan ditampilkan di sini -->
-        </div>
-        <div id="chatInput">
-            <input type="text" id="messageInput" placeholder="Ketik pesan...">
-            <button id="sendButton">Kirim</button>
-        </div>
+<div id="chatBox">
+    <div id="chatHeader">
+        Chat
+        <button class="minimize-btn" title="Minimize">−</button>
+        <button id="endChatBtn" title="Akhiri Pesan">Akhiri Pesan</button>
     </div>
+    <div id="chatBody">
+        <!-- Pesan chat akan ditampilkan di sini -->
+    </div>
+    <div id="chatInput">
+        <input type="text" id="messageInput" placeholder="Ketik pesan...">
+        <button id="sendButton">Kirim</button>
+    </div>
+</div>
 
     <!-- Icon Chat -->
     <div id="chatIcon">
-        <span>💬</span>
     </div>
 
     <!-- Footer -->
@@ -434,9 +420,6 @@
 
             createSnowflakes();
 
-            // Socket.IO connection and notification function
-            // const socket = io();
-
             // Listener for 'notification' event
             socket.on('notification', (data) => {
                 console.log('Notifikasi diterima dari server:', data);
@@ -451,45 +434,60 @@
             }
 
             // Chat functionality
-            const chatBox = document.getElementById('chatBox');
-            const chatHeader = document.getElementById('chatHeader');
-            const chatBody = document.getElementById('chatBody');
-            const messageInput = document.getElementById('messageInput');
-            const sendButton = document.getElementById('sendButton');
-            const minimizeButton = document.querySelector('#chatHeader .minimize-btn');
-            const chatIcon = document.getElementById('chatIcon');
+const chatBox = document.getElementById('chatBox');
+const chatHeader = document.getElementById('chatHeader');
+const chatBody = document.getElementById('chatBody');
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const minimizeButton = document.querySelector('#chatHeader .minimize-btn');
+const endChatButton = document.getElementById('endChatBtn');
+const chatIcon = document.getElementById('chatIcon');
 
-            chatHeader.addEventListener('click', () => {
-                chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
-            });
+chatHeader.addEventListener('click', () => {
+    chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+});
 
-            minimizeButton.addEventListener('click', () => {
-                chatBox.style.display = 'none';
-            });
+minimizeButton.addEventListener('click', () => {
+    chatBox.style.display = 'none';
+});
 
-            chatIcon.addEventListener('click', () => {
-                chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
-            });
+chatIcon.addEventListener('click', () => {
+    chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+});
 
-            sendButton.addEventListener('click', () => {
-                const message = messageInput.value;
-                if (message) {
-                    socket.emit('chatMessage', message);
-                    messageInput.value = '';
-                    chatBody.innerHTML += `<div class="user-message">${message}</div>`;
-                    chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
-                }
-            });
+sendButton.addEventListener('click', () => {
+    const message = messageInput.value;
+    if (message) {
+        socket.emit('chatMessage', message);
+        messageInput.value = '';
+        chatBody.innerHTML += `<div class="user-message">${message}</div>`;
+        chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
+    }
+});
 
-            // Listen for chat messages from the server (e.g., from Telegram bot)
-            socket.on('telegramMessage', (message) => {
-                console.log('Pesan dari bot Telegram diterima:', message);
-                chatBody.innerHTML += `<div class="bot-message">${message}</div>`;
-                chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
-            });
+endChatButton.addEventListener('click', () => {
+    // Kirim data chat ke backend
+    const chatHistory = chatBody.innerHTML;
+    fetch('/send-chat-history', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chatHistory })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+});
+
+// Listen for chat messages from the server (e.g., from Telegram bot)
+socket.on('telegramMessage', (message) => {
+    console.log('Pesan dari bot Telegram diterima:', message);
+    chatBody.innerHTML += `<div class="bot-message">${message}</div>`;
+    chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
+});
         });
     </script>    
 </body>
 
 </html>
-

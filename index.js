@@ -9,6 +9,8 @@ const path = require('path');
 const xlsx = require('xlsx');
 const http = require('http');
 const socketIo = require('socket.io');
+const nodemailer = require('nodemailer'); // Tambahkan di bagian atas bersama import lainnya
+
 
 const app = express();
 const port = 3000;
@@ -67,7 +69,7 @@ const TELEGRAM_BOT_TOKEN1 = '7269989921:AAEDVrc3hBFDCuqblhV8Pga5a3NaFvPR5iw'; //
 const CHAT_ID1 = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
 
 // URL webhook Telegram
-const TELEGRAM_WEBHOOK_URL = 'https://25ba-104-28-247-133.ngrok-free.app/'; // Ganti dengan URL webhook Anda
+const TELEGRAM_WEBHOOK_URL = 'https://7c3b-180-247-38-83.ngrok-free.app/'; // Ganti dengan URL webhook Anda
 
 
 // Fungsi untuk mengirim pesan ke Telegram
@@ -265,6 +267,53 @@ app.post('/store', (req, res) => {
     });
 });
 
+// Konfigurasi transport untuk nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Menggunakan Gmail sebagai layanan email
+    auth: {
+        user: 'dimm.pamm@gmail.com', // Ganti dengan email pengirim Anda
+        pass: 'eile vtcr tdyr zrof'    // Ganti dengan password email Anda
+    }
+});
+
+// Fungsi untuk mengirim email dengan lampiran file
+async function sendEmailWithAttachment(filePath) {
+    const mailOptions = {
+        from: 'dimm.pamm@gmail.com',
+        to: 'mojjitt0o@gmail.com',
+        subject: 'Riwayat Chatbox',
+        text: 'Berikut adalah riwayat chatbox dalam bentuk file teks.',
+        attachments: [
+            {
+                path: filePath
+            }
+        ]
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Email berhasil dikirim');
+    } catch (error) {
+        console.error('Gagal mengirim email:', error.message);
+    }
+}
+
+
+// Fungsi untuk menulis chat ke file teks
+function saveChatToFile(messageText) {
+    const filePath = path.join(__dirname, 'chat-history.txt');
+    fs.appendFile(filePath, `[${new Date().toISOString()}] ${messageText}\n`, (err) => {
+        if (err) {
+            console.error('Gagal menyimpan chat ke file:', err.message);
+        } else {
+            console.log('Chat berhasil disimpan ke file');
+        }
+    });
+}
+
+
+// Webhook handler untuk Telegram
+// Modifikasi rute '/webhook' untuk menyimpan chat ke file
 // Webhook handler untuk Telegram
 app.post('/webhook', (req, res) => {
     const update = req.body;
@@ -273,6 +322,9 @@ app.post('/webhook', (req, res) => {
     if (update.message) {
         const chatId = update.message.chat.id;
         const messageText = update.message.text;
+
+        // Simpan chat ke file
+        saveChatToFile(`[Telegram Chat ID: ${chatId}] ${messageText}`);
 
         // Kirim pesan balasan ke pengguna
         axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN1}/sendMessage`, {
@@ -290,6 +342,47 @@ app.post('/webhook', (req, res) => {
 
     res.sendStatus(200);
 });
+
+
+// Tambahkan log untuk debugging
+app.post('/chat-message', (req, res) => {
+    const message = req.body.message;
+    if (!message) {
+        return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Simpan chat ke file
+    saveChatToFile(`[chat-history] ${message}`);
+
+    // Kirim pesan ke bot Telegram
+    sendTelegramMessage(message).then(() => {
+        res.json({ status: 'success', message: 'Pesan berhasil dikirim ke Telegram dan disimpan' });
+    }).catch((error) => {
+        res.status(500).json({ error: 'Gagal mengirim pesan ke Telegram' });
+    });
+});
+
+
+
+// Endpoint untuk mengirim email dengan file teks
+app.post('/send-chat-history', (req, res) => {
+    const filePath = path.join(__dirname, 'chat-history.txt');
+
+    // Pastikan file chat-history.txt sudah ada dan berisi data
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err) {
+            console.error('File chat-history.txt tidak ditemukan');
+            return res.status(404).json({ error: 'File chat-history.txt tidak ditemukan' });
+        }
+
+        sendEmailWithAttachment(filePath).then(() => {
+            res.json({ status: 'success', message: 'Riwayat chat berhasil dikirim melalui email' });
+        }).catch((error) => {
+            res.status(500).json({ error: 'Gagal mengirim riwayat chat melalui email' });
+        });
+    });
+});
+
 
 // Setup webhook untuk bot Telegram
 async function setupTelegramWebhook() {
