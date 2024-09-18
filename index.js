@@ -61,15 +61,15 @@ db.query(createTableQuery, (err) => {
 });
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN = '7390265210:AAFAFKwsl8OVe-VvCafxVBGhfaQCiQNWsFg'; // Ganti dengan token bot Anda
-const CHAT_ID = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN = ''; // Ganti dengan token bot Anda
+const CHAT_ID = ''; // Ganti dengan chat ID atau grup ID Anda
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN1 = '7269989921:AAEDVrc3hBFDCuqblhV8Pga5a3NaFvPR5iw'; // Ganti dengan token bot Anda
-const CHAT_ID1 = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN1 = ''; // Ganti dengan token bot Anda
+const CHAT_ID1 = ''; // Ganti dengan chat ID atau grup ID Anda
 
 // URL webhook Telegram
-const TELEGRAM_WEBHOOK_URL = 'https://7c3b-180-247-38-83.ngrok-free.app/'; // Ganti dengan URL webhook Anda
+const TELEGRAM_WEBHOOK_URL = 'https://5d5d-149-108-168-39.ngrok-free.app/'; // Ganti dengan URL webhook Anda
 
 
 // Fungsi untuk mengirim pesan ke Telegram
@@ -108,8 +108,8 @@ async function sendEndpointNotification(endpoint, data) {
 }
 
 // Helper untuk memanggil API eksternal
-const authorization = 'Bearer SZS7NOV9IBE4TJTI';
-const apiBaseUrl = 'https://developer.fingerspot.io/api/';
+const authorization = 'Bearer ';
+const apiBaseUrl = '';
 
 async function callApi(endpoint, data, res, notificationEndpoint) {
     try {
@@ -136,7 +136,7 @@ async function callApi(endpoint, data, res, notificationEndpoint) {
 
 // Routes untuk setiap fungsi
 app.post('/api/delete_userinfo', (req, res) => {
-    const data = req.body;  // Contoh input JSON: {"trans_id":"1", "cloud_id":"C2630450C3233B26", "pin":"8"}
+    const data = req.body;  
     const notificationEndpoint = req.body.notification_endpoint; // Ambil endpoint notifikasi dari body request
     callApi('delete_userinfo', data, res, notificationEndpoint);
 });
@@ -262,6 +262,11 @@ app.post('/store', (req, res) => {
                 sendEndpointNotification(notification_endpoint, { cloud_id, type, created_at, original_data, scanTime });
             }
 
+            // Emit data baru ke semua klien yang terhubung
+    io.emit('update', {
+        cloud_id, type, created_at, original_data
+    });
+
             res.json({ status: 'success', message: 'Log berhasil disimpan dan notifikasi dikirim' });
         }
     });
@@ -271,16 +276,16 @@ app.post('/store', (req, res) => {
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Menggunakan Gmail sebagai layanan email
     auth: {
-        user: 'dimm.pamm@gmail.com', // Ganti dengan email pengirim Anda
-        pass: 'eile vtcr tdyr zrof'    // Ganti dengan password email Anda
+        user: '', // Ganti dengan email pengirim Anda
+        pass: ''    // Ganti dengan password email Anda
     }
 });
 
 // Fungsi untuk mengirim email dengan lampiran file
 async function sendEmailWithAttachment(filePath) {
     const mailOptions = {
-        from: 'dimm.pamm@gmail.com',
-        to: 'mojjitt0o@gmail.com',
+        from: '',
+        to: '',
         subject: 'Riwayat Chatbox',
         text: 'Berikut adalah riwayat chatbox dalam bentuk file teks.',
         attachments: [
@@ -312,9 +317,7 @@ function saveChatToFile(messageText) {
 }
 
 
-// Webhook handler untuk Telegram
-// Modifikasi rute '/webhook' untuk menyimpan chat ke file
-// Webhook handler untuk Telegram
+// Webhook handler untuk Telegram// Rute untuk webhook Telegram
 app.post('/webhook', (req, res) => {
     const update = req.body;
     console.log('Webhook diterima:', update);
@@ -337,11 +340,39 @@ app.post('/webhook', (req, res) => {
         });
 
         // Kirim pesan ke semua klien melalui Socket.IO
-        io.emit('telegramMessage', messageText);
+        io.emit('telegramMessage', { chatId, messageText });
     }
 
     res.sendStatus(200);
 });
+
+// Fungsi untuk menulis chat ke file teks
+function saveChatToFile(messageText) {
+    const filePath = path.join(__dirname, 'chat-history.txt');
+    fs.appendFile(filePath, `[${new Date().toISOString()}] ${messageText}\n`, (err) => {
+        if (err) {
+            console.error('Gagal menyimpan chat ke file:', err.message);
+        } else {
+            console.log('Chat berhasil disimpan ke file');
+        }
+    });
+}
+
+// Socket.io untuk pembaruan langsung
+io.on('connection', (socket) => {
+    console.log('Pengguna terhubung');
+
+    // Mengirim notifikasi ke semua pengguna yang terhubung ketika data baru diterima
+    socket.on('newData', (newData) => {
+        io.emit('update', newData);  // Emit event 'update' ke semua pengguna
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Pengguna terputus');
+    });
+});
+
+
 
 
 // Tambahkan log untuk debugging
@@ -432,21 +463,21 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.json({ status: 'success', message: 'File berhasil diupload dan diproses' });
 });
 
-// Socket.io untuk pembaruan langsung
-io.on('connection', (socket) => {
-    console.log('Pengguna terhubung');
+// // Socket.io untuk pembaruan langsung
+// io.on('connection', (socket) => {
+//     console.log('Pengguna terhubung');
 
-    // Kirim pesan ke pengguna saat data baru diterima
-    socket.on('chatMessage', async (message) => {
-        console.log('Pesan chat diterima:', message);
-        await sendTelegramMessage(message); // Pastikan ini benar
-        socket.emit('chatMessage', 'Pesan diterima dan dikirim ke Telegram');
-    });
+//     // Kirim pesan ke pengguna saat data baru diterima
+//     socket.on('chatMessage', async (message) => {
+//         console.log('Pesan chat diterima:', message);
+//         await sendTelegramMessage(message); // Pastikan ini benar
+//         socket.emit('chatMessage', 'Pesan diterima dan dikirim ke Telegram');
+//     });
 
-    socket.on('disconnect', () => {
-        console.log('Pengguna terputus');
-    });
-});
+//     socket.on('disconnect', () => {
+//         console.log('Pengguna terputus');
+//     });
+// });
 
 
 const excelExport = require('xlsx');
@@ -498,6 +529,14 @@ app.get('/log', (req, res) => {
             return res.status(500).json({ error: 'Failed to fetch logs' });
         }
         res.json(results);
+    });
+});
+
+// Menghubungkan client dengan socket.io
+io.on('connection', (socket) => {
+    console.log('Client terhubung');
+    socket.on('disconnect', () => {
+        console.log('Client terputus');
     });
 });
 

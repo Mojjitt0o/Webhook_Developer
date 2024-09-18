@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
@@ -126,7 +126,7 @@
             animation-duration: 20s;
         }
 
-        /* Responsive adjustments */
+        /* Penyesuaian Responsif */
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.2rem;
@@ -149,7 +149,7 @@
             }
         }
 
-        /* Chat Box Styles */
+        /* Gaya Kotak Chat (Dinonaktifkan) */
         #chatBox {
             position: fixed;
             bottom: 0;
@@ -234,13 +234,11 @@
             border-radius: 5px;
             margin-left: 10px;
         }
-
-        
     </style>
 </head>
 
 <body>
-    <!-- Snowflakes -->
+    <!-- Salju Salju -->
     <div class="snowflake">❄</div>
     <div class="snowflake">❄</div>
     <div class="snowflake">❄</div>
@@ -257,73 +255,76 @@
         <a class="navbar-brand" href="#">Webhook Developer Fingerspot.iO</a>
         <form id="excelFileForm" class="form-inline ml-auto" enctype="multipart/form-data">
             <input type="file" id="excelFile" name="file" class="form-control mr-2" accept=".xlsx, .xls" required>
-            <button type="submit" class="btn btn-primary">Upload Excel</button>
+            <button type="submit" class="btn btn-primary">Unggah Excel</button>
         </form>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Konten Utama -->
     <div class="container">
-        <!-- How it works Section -->
-        <h2>How it works?</h2>
+        <!-- Bagian Cara Kerja -->
+        <h2>Bagaimana Cara Kerjanya?</h2>
         <div class="row">
             <div class="col-md-8">
                 <iframe width="100%" height="315" src="https://www.youtube.com/embed/9EL1C_-akvQ" frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="col-md-4">
-                <img src="https://mentorit.com.np/wp-content/uploads/2016/10/red-hat-enterprise-linux-workstation-standard-subscription-rh0958488f3-redhat-0g559-1.jpg" alt="Illustration" class="img-fluid rounded shadow-sm" />
-                <p class="mt-3">Learn how the webhook works through our comprehensive tutorial video and guides. Ensure your integration is smooth and efficient.</p>
+                <img src="https://mentorit.com.np/wp-content/uploads/2016/10/red-hat-enterprise-linux-workstation-standard-subscription-rh0958488f3-redhat-0g559-1.jpg" alt="Ilustrasi" class="img-fluid rounded shadow-sm" />
+                <p class="mt-3">Pelajari bagaimana webhook bekerja melalui video tutorial dan panduan kami. Pastikan integrasi Anda berjalan lancar dan efisien.</p>
             </div>
         </div>
 
-        <!-- Logs Section -->
-        <h2 class="mt-5">Logs</h2>
+        <!-- Bagian Log -->
+        <h2 class="mt-5">Log</h2>
         <div class="table-responsive">
             <table id="logTable" class="display">
                 <thead>
                     <tr>
                         <th>Cloud ID</th>
-                        <th>Type</th>
-                        <th>Created At</th>
-                        <th>Original Data</th>
+                        <th>Jenis</th>
+                        <th>Dibuat Pada</th>
+                        <th>Data Asli</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Logs will be populated here -->
+                    <!-- Log akan diisi di sini -->
                 </tbody>
             </table>
         </div>
 
-        <!-- Export Button -->
-        <button id="exportLogs" class="btn btn-success mt-3">Export Logs to Excel</button>
+        <!-- Tombol Ekspor -->
+        <button id="exportLogs" class="btn btn-success mt-3">Ekspor Log ke Excel</button>
     </div>
 
-    <!-- Chat Box -->
-<div id="chatBox">
-    <div id="chatHeader">
-        Chat
-        <button class="minimize-btn" title="Minimize">−</button>
-        <button id="endChatBtn" title="Akhiri Pesan">Akhiri Pesan</button>
+    <!-- Kotak Chat (Dinonaktifkan) -->
+    <!-- 
+    <div id="chatBox">
+        <div id="chatHeader">
+            Chat
+            <button class="minimize-btn" title="Minimalkan">−</button>
+            <button id="endChatBtn" title="Akhiri Pesan">Akhiri Pesan</button>
+        </div>
+        <div id="chatBody">
+            <!-- Pesan chat akan ditampilkan di sini -->
+        </div>
+        <div id="chatInput">
+            <input type="text" id="messageInput" placeholder="Ketik pesan...">
+            <button id="sendButton">Kirim</button>
+        </div>
     </div>
-    <div id="chatBody">
-        <!-- Pesan chat akan ditampilkan di sini -->
-    </div>
-    <div id="chatInput">
-        <input type="text" id="messageInput" placeholder="Ketik pesan...">
-        <button id="sendButton">Kirim</button>
-    </div>
-</div>
 
-    <!-- Icon Chat -->
+    <!-- Ikon Chat (Dinonaktifkan) -->
+    <!-- 
     <div id="chatIcon">
     </div>
+    -->
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Webhook Developer Fingerspot | Created by CCO Pamungkas</p>
-        <a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a>
+        <p>&copy; 2024 Webhook Developer Fingerspot | Dibuat oleh CCO Pamungkas</p>
+        <a href="#">Kebijakan Privasi</a> | <a href="#">Syarat & Ketentuan</a>
     </footer>
 
-    <!-- jQuery and Bootstrap JS -->
+    <!-- jQuery dan Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- DataTables JS -->
@@ -333,50 +334,52 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         $(document).ready(function () {
-            const socket = io();
+        const socket = io();
 
-            // Initialize DataTable
-            let table = $('#logTable').DataTable({
-                "order": [[2, "desc"]] // Urutkan berdasarkan kolom 'Created At' secara menurun
-            });
+        // Inisialisasi DataTable
+        let table = $('#logTable').DataTable({
+            "order": [[2, "desc"]] // Urutkan berdasarkan kolom 'Dibuat Pada' secara menurun
+        });
 
-            // Listener for 'newData' event
-            socket.on('update', function (newData) {
-                // Add new row to DataTable
+        // Listener untuk event 'update'
+        socket.on('update', function (newData) {
+            console.log('Received update:', newData);  // Tambahkan log ini untuk melihat apakah data diterima
+            // Tambahkan baris baru ke DataTable
+            table.row.add([
+                newData.cloud_id || 'N/A',
+                newData.type || 'N/A',
+                newData.created_at || 'N/A',
+                `<code>${newData.original_data || 'N/A'}</code>`
+            ]).draw();
+
+            // Urutkan tabel ulang untuk memastikan entri terbaru ada di atas
+            table.order([[2, 'desc']]).draw();
+
+            // Notifikasi pop-up
+            alert('Halo ada data masuk!');  // Pop-up yang muncul saat ada data baru
+        });
+
+        // Ambil log dari server saat halaman dimuat
+        $.getJSON('/log', function (logs) {
+            logs.forEach(log => {
                 table.row.add([
-                    newData.cloud_id || 'N/A',
-                    newData.type || 'N/A',
-                    newData.created_at || 'N/A',
-                    `<code>${newData.original_data || 'N/A'}</code>`
+                    log.cloud_id || 'N/A',
+                    log.type || 'N/A',
+                    log.created_at || 'N/A',
+                    `<code>${log.original_data || 'N/A'}</code>`
                 ]).draw();
-
-                // Re-sort the table to ensure the latest entry is on top
-                table.order([[2, 'desc']]).draw();
-
-                // Notifikasi pop-up
-                alert('Halo ada data masuk!');
             });
 
-            // Fetch logs from server and display them
-            $.getJSON('/log', function (logs) {
-                logs.forEach(log => {
-                    table.row.add([
-                        log.cloud_id || 'N/A',
-                        log.type || 'N/A',
-                        log.created_at || 'N/A',
-                        `<code>${log.original_data || 'N/A'}</code>`
-                    ]).draw();
-                });
+            // Urutkan setelah data dimuat
+            table.order([[2, 'desc']]).draw();
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            // Tangani kesalahan
+            console.error('Error fetching logs:', textStatus, errorThrown);
+            table.clear().rows.add([['Gagal mengambil log', '', '', '']]).draw();
+        });
+    });
 
-                // Sort after data is loaded
-                table.order([[2, 'desc']]).draw();
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                // Handle errors
-                console.error('Error fetching logs:', textStatus, errorThrown);
-                table.clear().rows.add([['Failed to fetch logs', '', '', '']]).draw();
-            });
-
-            // Handle file upload
+            // Tangani unggahan file
             $('#excelFileForm').on('submit', function (event) {
                 event.preventDefault();
                 var formData = new FormData(this);
@@ -397,12 +400,12 @@
                 });
             });
 
-            // Export Logs to Excel
+            // Ekspor Log ke Excel
             $('#exportLogs').click(function () {
                 window.location.href = '/export-logs';
             });
 
-            // Snowflake generation script
+            // Script pembuatan salju
             function createSnowflakes() {
                 const body = document.body;
                 const numberOfSnowflakes = 20;
@@ -420,74 +423,76 @@
 
             createSnowflakes();
 
-            // Listener for 'notification' event
+            // Listener untuk event 'notification'
             socket.on('notification', (data) => {
                 console.log('Notifikasi diterima dari server:', data);
 
-                // Display notification on the web page
+                // Tampilkan notifikasi di halaman web
                 alert(`Notifikasi: ${JSON.stringify(data)}`);
             });
 
-            // Function to send notification to the server
+            // Fungsi untuk mengirim notifikasi ke server
             function sendNotification(data) {
                 socket.emit('notification', data);
             }
 
-            // Chat functionality
-const chatBox = document.getElementById('chatBox');
-const chatHeader = document.getElementById('chatHeader');
-const chatBody = document.getElementById('chatBody');
-const messageInput = document.getElementById('messageInput');
-const sendButton = document.getElementById('sendButton');
-const minimizeButton = document.querySelector('#chatHeader .minimize-btn');
-const endChatButton = document.getElementById('endChatBtn');
-const chatIcon = document.getElementById('chatIcon');
+            // Fungsionalitas Chat (Dinonaktifkan)
+            /*
+            const chatBox = document.getElementById('chatBox');
+            const chatHeader = document.getElementById('chatHeader');
+            const chatBody = document.getElementById('chatBody');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const minimizeButton = document.querySelector('#chatHeader .minimize-btn');
+            const endChatButton = document.getElementById('endChatBtn');
+            const chatIcon = document.getElementById('chatIcon');
 
-chatHeader.addEventListener('click', () => {
-    chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
-});
+            chatHeader.addEventListener('click', () => {
+                chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+            });
 
-minimizeButton.addEventListener('click', () => {
-    chatBox.style.display = 'none';
-});
+            minimizeButton.addEventListener('click', () => {
+                chatBox.style.display = 'none';
+            });
 
-chatIcon.addEventListener('click', () => {
-    chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
-});
+            chatIcon.addEventListener('click', () => {
+                chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+            });
 
-sendButton.addEventListener('click', () => {
-    const message = messageInput.value;
-    if (message) {
-        socket.emit('chatMessage', message);
-        messageInput.value = '';
-        chatBody.innerHTML += `<div class="user-message">${message}</div>`;
-        chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
-    }
-});
+            sendButton.addEventListener('click', () => {
+                const message = messageInput.value;
+                if (message) {
+                    socket.emit('chatMessage', message);
+                    messageInput.value = '';
+                    chatBody.innerHTML += `<div class="user-message">${message}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
+                }
+            });
 
-endChatButton.addEventListener('click', () => {
-    // Kirim data chat ke backend
-    const chatHistory = chatBody.innerHTML;
-    fetch('/send-chat-history', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ chatHistory })
-    })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error(error));
-});
+            endChatButton.addEventListener('click', () => {
+                // Kirim data chat ke backend
+                const chatHistory = chatBody.innerHTML;
+                fetch('/send-chat-history', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chatHistory })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+            });
 
-// Listen for chat messages from the server (e.g., from Telegram bot)
-socket.on('telegramMessage', (message) => {
-    console.log('Pesan dari bot Telegram diterima:', message);
-    chatBody.innerHTML += `<div class="bot-message">${message}</div>`;
-    chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
-});
-        });
-    </script>    
+            // Mendengarkan pesan chat dari server (misalnya, dari bot Telegram)
+            socket.on('telegramMessage', (message) => {
+                console.log('Pesan dari bot Telegram diterima:', message);
+                chatBody.innerHTML += `<div class="bot-message">${message}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight; // Scroll ke bagian bawah
+            });
+            */
+        
+    </script>
 </body>
 
 </html>
