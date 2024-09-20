@@ -41,6 +41,11 @@ db.connect((err) => {
     console.log('Terhubung ke MySQL');
 });
 
+const otherServers = [
+    { ip: '3.1.174.198', port: 8010 },
+    { ip: 'fdevice.com', port: 8010 }
+];
+
 // Membuat tabel karyawan jika belum ada
 const createTableQuery = `
 CREATE TABLE IF NOT EXISTS karyawan (
@@ -61,12 +66,12 @@ db.query(createTableQuery, (err) => {
 });
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN = ''; // Ganti dengan token bot Anda
-const CHAT_ID = ''; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN = '7390265210:AAFAFKwsl8OVe-VvCafxVBGhfaQCiQNWsFg'; // Ganti dengan token bot Anda
+const CHAT_ID = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
 
 // Token bot Telegram dan ID chat
-const TELEGRAM_BOT_TOKEN1 = ''; // Ganti dengan token bot Anda
-const CHAT_ID1 = ''; // Ganti dengan chat ID atau grup ID Anda
+const TELEGRAM_BOT_TOKEN1 = '7269989921:AAEDVrc3hBFDCuqblhV8Pga5a3NaFvPR5iw'; // Ganti dengan token bot Anda
+const CHAT_ID1 = '1421950780'; // Ganti dengan chat ID atau grup ID Anda
 
 // URL webhook Telegram
 const TELEGRAM_WEBHOOK_URL = 'https://5d5d-149-108-168-39.ngrok-free.app/'; // Ganti dengan URL webhook Anda
@@ -108,8 +113,8 @@ async function sendEndpointNotification(endpoint, data) {
 }
 
 // Helper untuk memanggil API eksternal
-const authorization = 'Bearer ';
-const apiBaseUrl = '';
+const authorization = 'Bearer SZS7NOV9IBE4TJTI';
+const apiBaseUrl = 'https://developer.fingerspot.io/api/';
 
 async function callApi(endpoint, data, res, notificationEndpoint) {
     try {
@@ -136,7 +141,7 @@ async function callApi(endpoint, data, res, notificationEndpoint) {
 
 // Routes untuk setiap fungsi
 app.post('/api/delete_userinfo', (req, res) => {
-    const data = req.body;  
+    const data = req.body;  // Contoh input JSON: {"trans_id":"1", "cloud_id":"C2630450C3233B26", "pin":"8"}
     const notificationEndpoint = req.body.notification_endpoint; // Ambil endpoint notifikasi dari body request
     callApi('delete_userinfo', data, res, notificationEndpoint);
 });
@@ -276,16 +281,16 @@ app.post('/store', (req, res) => {
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Menggunakan Gmail sebagai layanan email
     auth: {
-        user: '', // Ganti dengan email pengirim Anda
-        pass: ''    // Ganti dengan password email Anda
+        user: 'dimm.pamm@gmail.com', // Ganti dengan email pengirim Anda
+        pass: 'eile vtcr tdyr zrof'    // Ganti dengan password email Anda
     }
 });
 
 // Fungsi untuk mengirim email dengan lampiran file
 async function sendEmailWithAttachment(filePath) {
     const mailOptions = {
-        from: '',
-        to: '',
+        from: 'dimm.pamm@gmail.com',
+        to: 'mojjitt0o@gmail.com',
         subject: 'Riwayat Chatbox',
         text: 'Berikut adalah riwayat chatbox dalam bentuk file teks.',
         attachments: [
